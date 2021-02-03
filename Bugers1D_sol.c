@@ -12,6 +12,8 @@
 #define ny  41
 # include <time.h>
 
+double u_a(double x, double t);
+double u_b(double x, double t);
 
 int main (int* argv, char**argc)
 {
@@ -30,6 +32,7 @@ int main (int* argv, char**argc)
      //num of steps
     int step;
     int step_num = 80;
+    //double t;
 
 
      //initilise discristati
@@ -103,11 +106,9 @@ int main (int* argv, char**argc)
     double t = t_initial;
 
     //we need an array to set the boundary condition at the first node which is zero
-    double upper_boundery;
-    upper_boundery = -0.5;
+    u_new[0] = u_a(x_array[0], t);
+    u_new[n - 1] = u_b(x_array[n - 1], t);
 
-    double lower_boundary;
-    lower_boundary = 0.5;
 
     //this is the analytical solution of burgers, that we need for the first and last
     //node.
@@ -115,25 +116,63 @@ int main (int* argv, char**argc)
     double q;
     double r;
     double s;
+    double ua;
+    double ub;
 
-    q = 2 * (upper_boundery - lower_boundary) / pi;
-    r = (upper_boundery + lower_boundary) / 2;
+    ua = u_a(x_array[0], t);
+    ub = u_b(x_array[n - 1], t);
+
+
+    q = 2 * (ua - ub) / pi;
+    r = (ua + ub) / 2;
+
 
     s = 1;
 
     for (int i = 0; i < n; i++)
     {
         u_array[i] = -q * atan (s * (2.0 * x_array[i] - x_array[0] - x_array[n - 1]) / (x_array[n - 1] - x_array[0])) + r;
-        printf(" %14f", u_array[i]);
+        //printf(" %14f", u_array[i]);
     }
 
-    //now that we have plotted initial conditions we can finally start using the lax wendoff
-    //method to calculate the nodes at each point inisde the matrix, we will use the u and x array for this
-    u_new[0] = lower_boundary;
-    u_new[n - 1] = upper_boundery;
 
+    //implement lax wendoff
+    for (step = 1; step <= step_num; step++)
+    {
+        t = ((double)(step_num - step) * t_initial + (double)(step) * t_max) / (double)(step_num);
+
+        for (int i = 0; i < n - 1; i++)
+        {
+            u_new[i] = u_array[i];
+        }
+        for (int i = 1; i < n; i++)
+        {
+            u_new[i] = u_array[i] - (dt / dx) * (pow(u_array[i + 1], 2) - pow(u_array[i], 2)) + 0.5 * (dt * dt / dx / dx) * 0.5 *((u_array[i+1] + u_array[i]) * (pow(u_array[i+ 1], 2) - pow(u_array[i], 2)) - (u_array[i] + u_array[i - 1]) * (pow(u_array[i - 1], 2)));
+            printf(" %14f", u_new[i]);
+
+        }
+        u_new[0] = u_a(x_array[0], t);
+        u_new[n - 1] = u_b(x_array[n - 1], t);
+     printf("\n\n");
+    }
+    free(u_new);
+    free(u_array);
+    free(x_array);
 
 
 
 }
 
+double u_a(double x, double t)
+{
+    double ua;
+    ua = +0.5;
+    return ua;
+}
+
+double u_b(double x, double t)
+{
+    double ub;
+    ub = -0.5;
+    return ub;
+}
