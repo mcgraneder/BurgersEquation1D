@@ -106,8 +106,8 @@ int main (int* argv, char**argc)
     double t = t_initial;
 
     //we need an array to set the boundary condition at the first node which is zero
-    u_new[0] = u_a(x_array[0], t);
-    u_new[n - 1] = u_b(x_array[n - 1], t);
+    u_new[0] = 0.5;
+    u_new[n - 1] = -0.5;
 
 
     //this is the analytical solution of burgers, that we need for the first and last
@@ -119,8 +119,8 @@ int main (int* argv, char**argc)
     double ua;
     double ub;
 
-    ua = u_a(x_array[0], t);
-    ub = u_b(x_array[n - 1], t);
+    ua = 0.5;
+    ub = -0.5;
 
 
     q = 2 * (ua - ub) / pi;
@@ -148,11 +148,18 @@ int main (int* argv, char**argc)
         for (int i = 1; i < n; i++)
         {
             u_new[i] = u_array[i] - (dt / dx) * (pow(u_array[i + 1], 2) - pow(u_array[i], 2)) + 0.5 * (dt * dt / dx / dx) * 0.5 *((u_array[i+1] + u_array[i]) * (pow(u_array[i+ 1], 2) - pow(u_array[i], 2)) - (u_array[i] + u_array[i - 1]) * (pow(u_array[i - 1], 2)));
-            printf(" %14f", u_new[i]);
+
+
 
         }
-        u_new[0] = u_a(x_array[0], t);
-        u_new[n - 1] = u_b(x_array[n - 1], t);
+
+        u_new[0] = 0.5;
+        u_new[n - 1] = -0.5;
+
+    for (int i = 0; i < n; i++)
+    {
+         printf(" %14f", u_new[i]);
+    }
      printf("\n\n");
     }
     free(u_new);
@@ -163,16 +170,3 @@ int main (int* argv, char**argc)
 
 }
 
-double u_a(double x, double t)
-{
-    double ua;
-    ua = +0.5;
-    return ua;
-}
-
-double u_b(double x, double t)
-{
-    double ub;
-    ub = -0.5;
-    return ub;
-}
